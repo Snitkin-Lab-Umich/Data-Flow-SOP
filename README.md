@@ -69,7 +69,7 @@ create_directories.py  move_files_to_directories_illumina.py  README.md  rename_
 
 ```
 
-### Create project folder 
+## Create project folder 
  
 **If your project folder already exists, skip to this [step](#Rename-samples).**
 
@@ -144,7 +144,7 @@ Success! All specified directories have been created.
 
 If your Project directory looks like the above, you are ready to move to the next step. 
 
-### Rename samples
+## Rename samples
 
 4. Once you have created the Project folder/confirmed the existence of an already created Project folder, navigate to this directory `/nfs/turbo/umms-esnitkin/Raw_sequencing_data/` and find the folder corresponding to your dataset. Rename samples using demultiplex file `DemuxStats_*.csv`. 
 
@@ -251,7 +251,7 @@ MERLIN_107_R2.fastq.gz  MERLIN_10_R2.fastq.gz  MERLIN_111_R2.fastq.gz  MERLIN_11
 
 _**STOP AND CHECK**_: If there are some files that have not been renamed, please slack Dhatri immediately and do not move forward with the following steps.
 
-### Create plate directory to house the renamed samples
+## Create plate directory to house the renamed samples
 
 Once the samples have been renamed, you are now ready to move them from temporary storage `Raw_sequencing_data/dataset_folder/fastq_folder` to a more permanent location—your Project folder `/nfs/turbo/umms-esnitkin/Project_Name`. 
 
@@ -331,7 +331,7 @@ Success! All specified directories have been created.
 _**STOP AND CHECK**_: If your plate directory aka `../Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3` does not have the sub-directories as seen above, do not carry on and slack Dhatri. 
 
 
-### Move renamed samples to Project folder 
+## Move renamed samples to Project folder 
 8. Before you move QCD outputs, to relevant directories on Project folder i.e. the path to your Project folder on turbo. 
 
 > Log onto [globus](https://app.globus.org/file-manager?two_pane=true). Move only the fastq files from  `/nfs/turbo/umms-esnitkin/Raw_sequencing_data/test_illumina_org/fastqs_test_illumina/` to the `raw_fastq` folder in your Project folder on turbo i.e. `/nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/raw_fastq`
@@ -353,16 +353,17 @@ DemuxStats_Test_Illumina_Org.csv  README.md  renamed_file_commands.sh
 
 <!-- >![image](pics/other_files.png)-->
 
-### Run QCD
+## Run QCD
+
 9. You are now ready to start processing your short reads. We will be using one of our in house pipelines, [QCD](https://github.com/Snitkin-Lab-Umich/QCD), to run on the renamed samples. Click on the link and follow the instructions as described on the Github page. _**Note: QCD can only be run on samples one species at a time.**_
 
 _**STOP AND CHECK**_: If you run into any issues running QCD, please slack Dhatri immediately and do not move forward with the following steps. Ensure you have generated the QC report before moving on.
 
-### Move QCD outputs to Project directory
+## Move QCD outputs to Project directory
 <!-- > E -->
 Once you have finished running QCD on your scratch directory and globus has succesfully transferred the raw fastq files, you are ready to move importatn QCD outputs to your Project folder. 
 
-8. Start and interative session and navigate to your QCD results folder.
+10. Start and interative session and navigate to your QCD results folder.
 
 > Start an interactive session. Increase/decrease `--cpus-per-task` and `--time` according to your sample size. 
 ```
@@ -383,7 +384,7 @@ srun: job 12759868 has been allocated resources
 2024-05-21_Project_Test_QCD  2024-06-04_Project_Merlin_QCD
 ```
 
-9. Move QCD outputs using  `move_files_to_directories_illumina.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/move_files_to_directories_illumina.py -h`.
+11. Move QCD outputs using  `move_files_to_directories_illumina.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/move_files_to_directories_illumina.py -h`.
 
 ```
 (base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py -h
