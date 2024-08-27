@@ -44,7 +44,7 @@ class CustomArgumentParser(argparse.ArgumentParser):
         return close_matches[0] if close_matches else None
 
 def main():
-    parser = CustomArgumentParser(description="Create directory structure for sequencing data.")
+    parser = CustomArgumentParser(description="Create directory structure for illumina data.")
     parser.add_argument("--dest_path", required=True, help="Destination path where directories need to be created—do NOT include project name (e.g., /nfs/turbo/umms-esnitkin/)")
     parser.add_argument("--project_name", required=True, help="Name of your project (format: Project_Name-of-Project, e.g., Project_MDHHS)")
     parser.add_argument("--data_type", choices=["illumina", "nanopore", "both"], required=True, help="Type of data (illumina/nanopore/both)")
@@ -69,6 +69,9 @@ def main():
     if not validate_folders(parser, project_path, data_type, folder_names_illumina, folder_names_nanopore):
         parser.error("\nFolder validation failed. See above for details.")  # Use parser.error to handle argument-related errors
 
+    # Create common directories
+    create_common_directories(project_path)
+
     # Create assembly directory with subfolders based on data type
     create_assembly_structure(project_path, data_type)
 
@@ -76,10 +79,33 @@ def main():
     if data_type in ["illumina", "both"]:
         process_folders(project_path, "illumina", folder_names_illumina)
 
-    if data_type in ["nanopore", "both"]:
+    elif data_type in ["both"]:
+        process_folders(project_path, "illumina", folder_names_illumina)
+        process_folders(project_path, "ONT", folder_names_nanopore)
+
+    else: #data_type in ["nanopore", "both"]:
         process_folders(project_path, "ONT", folder_names_nanopore)
 
     print("\nSuccess! All specified directories have been created.")
+
+def create_common_directories(project_path):
+    metadata_path = os.path.join(project_path, "Sequence_data", "metadata")
+    sample_lookup_path = os.path.join(project_path, "Sequence_data", "metadata", "sample_lookup")
+    AGC_submission_path = os.path.join(project_path, "Sequence_data", "metadata", "AGC_submission")
+    plasmidsaurus_path = os.path.join(project_path, "Sequence_data", "metadata", "plasmidsaurus")
+    variant_calling_path = os.path.join(project_path, "Sequence_data", "variant_calling")
+    try:
+        os.makedirs(metadata_path, exist_ok=True)
+        os.makedirs(sample_lookup_path, exist_ok=True)
+        os.makedirs(AGC_submission_path, exist_ok=True)
+        os.makedirs(plasmidsaurus_path, exist_ok=True)
+        print(f"\nMetadata and subdirectories created successfully at {metadata_path}.")
+        
+        os.makedirs(variant_calling_path, exist_ok=True)
+        print(f"\nVariant calling folder created successfully at {variant_calling_path}.")
+    
+    except Exception as e:
+        print(f"Error creating common directories: {str(e)}")
 
 def create_assembly_structure(project_path, data_type):
     assembly_path = os.path.join(project_path, "Sequence_data", "assembly")
@@ -87,15 +113,21 @@ def create_assembly_structure(project_path, data_type):
     try:
         os.makedirs(assembly_path, exist_ok=True)
 
-        if data_type == "illumina" or data_type == "both":
+        if data_type in ["illumina"]:
             illumina_path = os.path.join(assembly_path, "illumina")
             os.makedirs(illumina_path, exist_ok=True)
         
-        if data_type == "nanopore" or data_type == "both":
+        elif data_type in ["both"]:
+            illumina_path = os.path.join(assembly_path, "illumina")
             ont_path = os.path.join(assembly_path, "ONT")
             hybrid_path = os.path.join(assembly_path, "hybrid")
+            os.makedirs(illumina_path, exist_ok=True)
             os.makedirs(ont_path, exist_ok=True)
             os.makedirs(hybrid_path, exist_ok=True)
+        
+        else: #data_type in ["nanopore", "both"]:
+            ont_path = os.path.join(assembly_path, "ONT")          
+            os.makedirs(ont_path, exist_ok=True)
 
         print(f"\nAssembly directory structure created successfully.")
     except Exception as e:
@@ -164,8 +196,8 @@ def validate_folders(parser, project_path, data_type, folder_names_illumina, fol
     if data_type in ["nanopore"]:
         if folder_names_nanopore:
             for folder_name in folder_names_nanopore.split(','):
-                if not re.match(r'^\d{4}-\d{2}-\d{2}_Plate\d+(-to-Plate\d+)?$', folder_name.strip()):
-                    parser.error(f"\nInvalid format for ONT folder name: {folder_name}. Format should be 'year-month-day_PlateNumber-to-PlateNumber'.")
+                if not re.match(r'^\d{4}-\d{2}-\d{2}_Batch\d+(-to-Batch\d+)?(_rerun)?$', folder_name.strip()):
+                    parser.error(f"\nInvalid format for ONT folder name: {folder_name}. Format should be 'year-month-day_BatchNum-to-BatchNum', 'year-month-day_BatchNum-to-BatchNum_rerun', 'year-month-day_BatchNum', or 'year-month-day_BatchNum_rerun'.")
                     return False
                 folder_path = os.path.join(project_path, "Sequence_data", "ONT", folder_name.strip())
                 if os.path.exists(folder_path):
