@@ -41,7 +41,7 @@ class CustomArgumentParser(argparse.ArgumentParser):
         return close_matches[0] if close_matches else None
 
 def main():
-    parser = CustomArgumentParser(description="Create directory structure for sequencing data.")
+    parser = CustomArgumentParser(description="Create project folder and higher level directory structure for illumina data.")
     parser.add_argument("--dest_path", required=True, help="Destination path where directories need to be created—do NOT include project name (e.g., /nfs/turbo/umms-esnitkin/)")
     parser.add_argument("--project_name", required=True, help="Name of your project (format: Project_Name-of-Project, e.g., Project_MDHHS)")
     parser.add_argument("--data_type", choices=["illumina", "nanopore", "both"], required=True, help="Type of data (illumina/nanopore/both)")
@@ -108,10 +108,10 @@ def create_assembly_structure(project_path, data_type):
         elif data_type in ["both"]:
             illumina_path = os.path.join(assembly_path, "illumina")
             ont_path = os.path.join(assembly_path, "ONT")
-            hybrid_path = os.path.join(assembly_path, "hybrid")
+            #hybrid_path = os.path.join(assembly_path, "hybrid")
             os.makedirs(illumina_path, exist_ok=True)
             os.makedirs(ont_path, exist_ok=True)
-            os.makedirs(hybrid_path, exist_ok=True)
+            #os.makedirs(hybrid_path, exist_ok=True)
         
         else: #data_type in ["nanopore", "both"]:
             ont_path = os.path.join(assembly_path, "ONT")          
