@@ -44,7 +44,7 @@ def setup_directories(plate_info_path):
         if not os.path.exists(f):
             open(f, 'a').close()
             if f == files["master_qc_summary_file"]:
-                print(f"Created master QC summary file at: {f}")
+                print(f"\nCreated master QC summary file at: {f}")
     
     with open(files["missing_samples_file"], 'w') as f:
         f.write("missing_sample,which_folder\n")
@@ -104,7 +104,7 @@ def process_qc_summary(qc_summary_file, dirs, files):
                         writer.writerow(row)  # Write header only if master file is empty
                 else:
                     writer.writerow(row)
-        print(f"Appended {qc_summary_file} to {files['master_qc_summary_file']}")
+        print(f"\nAppended {qc_summary_file} to {files['master_qc_summary_file']}")
 
     with open(files["missing_samples_file"], 'r') as f:
         lines = f.readlines()
@@ -112,7 +112,7 @@ def process_qc_summary(qc_summary_file, dirs, files):
     if len(lines) > 1:
         print(f"Some files are missing and are listed in {files['missing_samples_file']}.")
     else:
-        print("Yay, all files were transferred to their respective folders successfully!")
+        print("\nYay, all files were transferred to their respective folders successfully!")
         os.remove(files["missing_samples_file"])
 
 def move_passed_samples(plate_info_path, clean_fastq_qc_pass_samples_dir):
@@ -154,7 +154,7 @@ def move_passed_samples(plate_info_path, clean_fastq_qc_pass_samples_dir):
                 all_files_moved = False
 
     if all_files_moved:
-        print("Yay, samples from passed_samples.txt file have been moved to clean_fastq_qc_pass_samples directory!")
+        print("\nYay, samples from passed_samples.txt file have been moved to clean_fastq_qc_pass_samples directory!")
     else:
         print("Some files were not moved successfully. Please check the log messages above and correct any issues.")
 
@@ -201,13 +201,13 @@ def move_qcd_outputs_to_assembly(plate_info_path, assembly_dir):
                 all_successful = False
 
     if all_successful:
-        print("Yay, all specified samples have been moved to the assembly directory successfully!")
+        print("\nYay, all specified samples have been moved to the assembly directory successfully!")
     else:
         print("Some samples or required files were not found. Please check the logs above for details.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process and organize illumina sequencing data.")
-    parser.add_argument("--plate_info_path", required=True, help="Path to the date_PlateInfo directory (e.g., /nfs/turbo/umms-esnitkin/Project_Marimba/Sequence_data/illumina_fastq/2024-12-24_Plate1-to-Plate3")
+    parser.add_argument("--plate_info_path", required=True, help="Path to the date_PlateInfo directory (e.g., /nfs/turbo/umms-esnitkin/Project_Marimba/Sequence_data/illumina_fastq/2024-12-24_Plate1-to-Plate3)")
     parser.add_argument("--qcd_results_path", required=True, help="Path to the QCD results directory (e.g., /scratch/esnitkin_root/esnitkin1/dhatrib/QCD/results/Project_MDHHS_QCD)")
 
     args = parser.parse_args()
