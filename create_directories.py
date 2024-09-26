@@ -120,10 +120,10 @@ def create_assembly_structure(project_path, data_type):
         elif data_type in ["both"]:
             illumina_path = os.path.join(assembly_path, "illumina")
             ont_path = os.path.join(assembly_path, "ONT")
-            hybrid_path = os.path.join(assembly_path, "hybrid")
+            #hybrid_path = os.path.join(assembly_path, "hybrid")
             os.makedirs(illumina_path, exist_ok=True)
             os.makedirs(ont_path, exist_ok=True)
-            os.makedirs(hybrid_path, exist_ok=True)
+            #os.makedirs(hybrid_path, exist_ok=True)
         
         else: #data_type in ["nanopore", "both"]:
             ont_path = os.path.join(assembly_path, "ONT")          
@@ -147,7 +147,6 @@ def create_ont_structure(project_path, folder_name):
     print(f"\nCreating ONT directory structure for {folder_name} under {project_path}")
     base_path = os.path.join(project_path, "Sequence_data", "ONT", folder_name)
     os.makedirs(os.path.join(base_path, "failed_qc_samples"), exist_ok=True)
-    #os.makedirs(os.path.join(base_path, "neg_ctrl"), exist_ok=True)
     os.makedirs(os.path.join(base_path, "passed_qc_samples"), exist_ok=True)
     os.makedirs(os.path.join(base_path, "raw_fastq"), exist_ok=True)
     os.makedirs(os.path.join(project_path, "Sequence_data", "ONT", "clean_fastq_qc_pass_samples"), exist_ok=True)
