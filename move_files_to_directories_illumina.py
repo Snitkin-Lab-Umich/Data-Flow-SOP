@@ -8,18 +8,8 @@ def validate_path(path):
         path = input(f"The path '{path}' does not exist. Please enter a valid path: ")
     return path
 
-def move_qcd_folder(qcd_results_path, plate_info_path):
-    qcd_folder_name = os.path.basename(os.path.normpath(qcd_results_path))
-    shutil.move(qcd_results_path, plate_info_path)
-    
-    qc_summary_file = os.path.join(plate_info_path, f"{qcd_folder_name}/{qcd_folder_name}_Report/data/{qcd_folder_name}_QC_summary.csv")
-    
-    if not os.path.isfile(qc_summary_file):
-        print(f"QC summary file not found at '{qc_summary_file}'! Are you sure you ran QCD entirely?")
-        exit(1)
-    return qc_summary_file
-
 def setup_directories(plate_info_path):
+    plate_info_path = os.path.normpath(plate_info_path)
     illumina_fastq_dir = os.path.dirname(plate_info_path)
     sequence_data_dir = os.path.dirname(illumina_fastq_dir)
 
@@ -56,7 +46,17 @@ def move_neg_ctrl_samples(raw_fastq_dir, neg_ctrl_dir):
         if "_NEG_CTL" in file:
             shutil.move(os.path.join(raw_fastq_dir, file), neg_ctrl_dir)
 
-def process_qc_summary(qc_summary_file, dirs, files):
+def process_qc_summary(qcd_results_path, dirs, files):
+    qcd_folder_name = os.path.basename(os.path.normpath(qcd_results_path))
+
+    qcd_results_path = os.path.normpath(qcd_results_path)
+ 
+    qc_summary_file = os.path.join(qcd_results_path, f"{qcd_folder_name}_Report/data/{qcd_folder_name}_QC_summary.csv")
+    
+    if not os.path.isfile(qc_summary_file):
+        print(f"QC summary file not found at '{qc_summary_file}'! Are you sure you ran QCD entirely?")
+        exit(1)
+
     with open(qc_summary_file, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         samples_processed = 0
@@ -69,7 +69,7 @@ def process_qc_summary(qc_summary_file, dirs, files):
             reverse = f"{sample}_R2.fastq.gz"
             forward_path = os.path.join(dirs["raw_fastq_dir"], forward)
             reverse_path = os.path.join(dirs["raw_fastq_dir"], reverse)
-            dest_dir = dirs["passed_qc_samples_dir"] if qc_check == "0" else dirs["failed_qc_samples_dir"]
+            dest_dir = dirs["passed_qc_samples_dir"] if qc_check == "PASS" else dirs["failed_qc_samples_dir"]
 
             if "_NEG_CTL" in sample:
                 dest_dir = dirs["neg_ctrl_dir"]
@@ -81,7 +81,7 @@ def process_qc_summary(qc_summary_file, dirs, files):
                 if qc_check == "FAIL" and dest_dir != dirs["neg_ctrl_dir"]:
                     with open(files["failed_samples_file"], 'a') as f:
                         f.write(f"{sample}\n")
-                elif qc_check == "0":
+                elif qc_check == "PASS":
                     with open(files["passed_samples_file"], 'a') as f:
                         f.write(f"{sample}\n")
 
@@ -115,12 +115,11 @@ def process_qc_summary(qc_summary_file, dirs, files):
         print("\nYay, all files were transferred to their respective folders successfully!")
         os.remove(files["missing_samples_file"])
 
-def move_passed_samples(plate_info_path, clean_fastq_qc_pass_samples_dir):
-    #illumina_fastq_dir = os.path.dirname(plate_info_path)
-    #clean_fastq_qc_pass_samples_dir = os.path.join(illumina_fastq_dir, "clean_fastq_qc_pass_samples")
+def move_passed_samples(plate_info_path, qcd_results_path, clean_fastq_qc_pass_samples_dir):
 
-    #os.makedirs(clean_fastq_qc_pass_samples_dir, exist_ok=True)
-
+    qcd_results_path = os.path.normpath(qcd_results_path)
+    plate_info_path = os.path.normpath(plate_info_path)
+ 
     passed_samples_file = os.path.join(plate_info_path, "passed_samples.txt")
     if not os.path.isfile(passed_samples_file):
         print("No passed_samples.txt file found! Are you sure you moved the raw fastq reads into their respective directories (passed and failed qc folders)?")
@@ -130,27 +129,28 @@ def move_passed_samples(plate_info_path, clean_fastq_qc_pass_samples_dir):
     with open(passed_samples_file, 'r') as f:
         for sample in f:
             sample = sample.strip()
-            qcd_dir = next((d for d in os.listdir(plate_info_path) if d.endswith('_QCD') and os.path.isdir(os.path.join(plate_info_path, d, sample, "trimmomatic"))), None)
-            if qcd_dir:
-                qcd_dir = os.path.join(plate_info_path, qcd_dir, sample, "trimmomatic")
+            #qcd_dir = next((d for d in os.listdir(plate_info_path) if d.endswith('_QCD') and os.path.isdir(os.path.join(plate_info_path, d, sample, "trimmomatic"))), None)
+            
+            if qcd_results_path:
+                trimmomatic_dir = os.path.join(qcd_results_path, "trimmomatic", sample)
                 forward = f"{sample}_R1_trim_paired.fastq.gz"
                 reverse = f"{sample}_R2_trim_paired.fastq.gz"
-                forward_path = os.path.join(qcd_dir, forward)
-                reverse_path = os.path.join(qcd_dir, reverse)
+                forward_path = os.path.join(trimmomatic_dir, forward)
+                reverse_path = os.path.join(trimmomatic_dir, reverse)
 
                 if os.path.isfile(forward_path):
                     shutil.move(forward_path, clean_fastq_qc_pass_samples_dir)
                 else:
-                    print(f"Warning: {forward} not found in {qcd_dir}")
+                    print(f"Warning: {forward} not found in {trimmomatic_dir}")
                     all_files_moved = False
 
                 if os.path.isfile(reverse_path):
                     shutil.move(reverse_path, clean_fastq_qc_pass_samples_dir)
                 else:
-                    print(f"Warning: {reverse} not found in {qcd_dir}")
+                    print(f"Warning: {reverse} not found in {trimmomatic_dir}")
                     all_files_moved = False
             else:
-                print(f"No trimmomatic directory found for sample {sample}!")
+                print(f"No trimmomatic directory found for sample: {sample}!")
                 all_files_moved = False
 
     if all_files_moved:
@@ -158,7 +158,11 @@ def move_passed_samples(plate_info_path, clean_fastq_qc_pass_samples_dir):
     else:
         print("Some files were not moved successfully. Please check the log messages above and correct any issues.")
 
-def move_qcd_outputs_to_assembly(plate_info_path, assembly_dir):
+def move_qcd_outputs_to_assembly(plate_info_path, qcd_results_path, assembly_dir):
+
+    qcd_results_path = os.path.normpath(qcd_results_path)
+    plate_info_path = os.path.normpath(plate_info_path)
+
     passed_samples_file = os.path.join(plate_info_path, "passed_samples.txt")
     if not os.path.isfile(passed_samples_file):
         print(f"passed_samples.txt not found in directory: {plate_info_path}")
@@ -168,31 +172,31 @@ def move_qcd_outputs_to_assembly(plate_info_path, assembly_dir):
     with open(passed_samples_file, 'r') as f:
         for sample in f:
             sample = sample.strip()
-            qcd_dir = next((d for d in os.listdir(plate_info_path) if d.endswith('_QCD')), None)
-            if qcd_dir:
-                qcd_dir = os.path.join(plate_info_path, qcd_dir, sample)
+            #qcd_dir = next((d for d in os.listdir(plate_info_path) if d.endswith('_QCD')), None)
+            if qcd_results_path:
+                #qcd_dir = os.path.join(plate_info_path, qcd_dir, sample)
 
-                prokka_dir = os.path.join(qcd_dir, "prokka")
+                prokka_dir = os.path.join(qcd_results_path, "prokka", sample)
                 if os.path.isdir(prokka_dir):
-                    dest_dir = os.path.join(assembly_dir, sample)
+                    dest_dir = os.path.join(assembly_dir, "prokka")
                     os.makedirs(dest_dir, exist_ok=True)
                     shutil.move(prokka_dir, dest_dir)
                 else:
                     print(f"Prokka directory not found for sample: {sample}")
                     all_successful = False
 
-                spades_contigs = os.path.join(qcd_dir, "spades", "contigs.fasta")
+                spades_contigs = os.path.join(qcd_results_path, "spades", sample, f"{sample}_contigs_l1000.fasta")
                 if os.path.isfile(spades_contigs):
-                    spades_dir = os.path.join(assembly_dir, sample, "spades")
+                    spades_dir = os.path.join(assembly_dir, "spades", sample)
                     os.makedirs(spades_dir, exist_ok=True)
-                    shutil.move(spades_contigs, os.path.join(spades_dir, "contigs.fasta"))
+                    shutil.move(spades_contigs, spades_dir)
                 else:
-                    print(f"contigs.fasta not found for sample: {sample}")
+                    print(f"assembly fasta file not found for sample: {sample} in {spades_dir}")
                     all_successful = False
 
-                quast_dir = os.path.join(qcd_dir, "quast")
+                quast_dir = os.path.join(qcd_results_path, "quast", sample)
                 if os.path.isdir(quast_dir):
-                    shutil.move(quast_dir, os.path.join(assembly_dir, sample))
+                    shutil.move(quast_dir, os.path.join(assembly_dir, "quast", sample))
                 else:
                     print(f"Quast directory not found for sample: {sample}")
                     all_successful = False
@@ -207,17 +211,17 @@ def move_qcd_outputs_to_assembly(plate_info_path, assembly_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process and organize illumina sequencing data.")
-    parser.add_argument("--plate_info_path", required=True, help="Path to the date_PlateInfo directory (e.g., /nfs/turbo/umms-esnitkin/Project_Marimba/Sequence_data/illumina_fastq/2024-12-24_Plate1-to-Plate3)")
-    parser.add_argument("--qcd_results_path", required=True, help="Path to the QCD results directory (e.g., /scratch/esnitkin_root/esnitkin1/dhatrib/QCD/results/Project_MDHHS_QCD)")
+    parser.add_argument("--plate_info_path", required=True, help="Path to the date_PlateInfo directory (e.g., /nfs/turbo/umms-esnitkin/Project_Marimba/Sequence_data/illumina_fastq/2024-09-24_Plate1-to-Plate15)")
+    parser.add_argument("--qcd_results_path", required=True, help="Path to the QCD results directory in project folder (e.g., /nfs/turbo/umms-esnitkin/Project_MDHHS_genomics/Sequence_data/illumina_fastq/2024-09-24_Plate1-to-Plate15/2024_09_25_Project_MDHHS_genomics_QCD)")
 
     args = parser.parse_args()
 
     plate_info_path = validate_path(args.plate_info_path)
     qcd_results_path = validate_path(args.qcd_results_path)
 
-    qc_summary_file = move_qcd_folder(qcd_results_path, plate_info_path)
+    #qc_summary_file = move_qcd_folder(qcd_results_path, plate_info_path)
     dirs, files = setup_directories(plate_info_path)
     move_neg_ctrl_samples(dirs["raw_fastq_dir"], dirs["neg_ctrl_dir"])
-    process_qc_summary(qc_summary_file, dirs, files)
-    move_passed_samples(plate_info_path, dirs["clean_fastq_qc_pass_samples_dir"])
-    move_qcd_outputs_to_assembly(plate_info_path, dirs["assembly_dir"])
+    process_qc_summary(qcd_results_path, dirs, files)
+    move_passed_samples(plate_info_path, qcd_results_path, dirs["clean_fastq_qc_pass_samples_dir"])
+    move_qcd_outputs_to_assembly(plate_info_path, qcd_results_path, dirs["assembly_dir"])
