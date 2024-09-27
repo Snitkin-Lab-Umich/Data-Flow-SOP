@@ -44,14 +44,14 @@ while IFS=, read -r project sample_id description barcode reads; do
             read_number=$(echo "$base_name" | grep -oP '_R[12]')
             sample_base=$(echo "$base_name" | xargs | sed -E "s/_R[12]_.*//")
 
-            #echo "Base Name: $sample_base, Sample ID: $sample_id, Read Number: $read_number"  # Debugging info
+            #echo "Base Name: $sample_base, Sample ID: $sample_id, Read Number: $read_number"  
             
             # Check if sample_base matches the sample ID from the CSV
             if [[ $sample_base == $sample_id ]]; then  
                 new_file="${fastq_directory}/${description}${read_number}.fastq.gz"
                 echo "Renaming sample $fastq_file to $new_file"
                 echo "mv $fastq_file $new_file" >> "$log_file"
-                # Uncomment to perform the rename
+                
                 mv "$fastq_file" "$new_file"
                 rename_fastq=true
             fi
