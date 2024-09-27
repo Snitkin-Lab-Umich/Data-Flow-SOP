@@ -363,7 +363,24 @@ _**STOP AND CHECK**_: If you run into any issues running QCD, please slack Dhatr
 <!-- > E -->
 Once you have finished running QCD on your scratch directory and globus has succesfully transferred the raw fastq files, you are ready to move importatn QCD outputs to your Project folder. 
 
-10. Start and interative session and navigate to your QCD results folder.
+10. Move QCD results using [globus](https://app.globus.org/file-manager?two_pane=true) since the output files are massive and take a while to transfer.
+
+> Log onto [globus](https://app.globus.org/file-manager?two_pane=true). Move only the QCD results directory i.e. `2024-06-04_Project_Merlin_QCD` from  `/scratch/esnitkin_root/esnitkin1/dhatrib/QCD/results/2024-06-04_Project_Merlin_QCD/` to the `illumina_fastq` folder in your Project directory on turbo i.e. `/nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/`
+
+![image](pics/transfer-qcd-results.png)
+
+11. Once you have confirmed that the results has been moved (you should get an email from globus), create a folder, `QCD_snakemake_pipeline`, in your newly moved results folder here `/nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/`.
+
+> `cd` into your QCD results folder and create a new folder `QCD_snakemake_pipeline`.
+
+```
+(base) [dhatrib@gl-login3 QCD]$ cd /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/
+(base) [dhatrib@gl-login3 2024-06-04_Project_Merlin_QCD]$ mkdir QCD_snakemake_pipeline
+(base) [dhatrib@gl-login3 2024-06-04_Project_Merlin_QCD]$ ls
+2024-06-04_Project_Merlin_QCD_Report QCD_snakemake_pipeline  mlst  raw_coverage  spades ....
+```
+
+11. Start and interative session and navigate to your QCD results folder.
 
 > Start an interactive session. Increase/decrease `--cpus-per-task` and `--time` according to your sample size. 
 ```
@@ -372,19 +389,28 @@ srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-
 
 > Ensure you are in the right directory.
 ```
-cd /scratch/esnitkin_root/esnitkin1/uniqname/path/to/QCD/results/
+cd /scratch/esnitkin_root/esnitkin1/uniqname/path/to/QCD
 ```
 
 > This is what you should be seeing after finishing the 2 steps above. 
 ```
-(base) [dhatrib@gl-login3 results]$ srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=3 --time=8:00:00 --pty /bin/bash
+(base) [dhatrib@gl-login3 QCD]$ srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=3 --time=8:00:00 --pty /bin/bash
 srun: job 12759868 queued and waiting for resources
 srun: job 12759868 has been allocated resources
-(base) [dhatrib@gl3021 results]$ ls
-2024-05-21_Project_Test_QCD  2024-06-04_Project_Merlin_QCD
+(base) [dhatrib@gl3021 QCD]$ ls
+config    QCD.smk   QCD_report.smk README.md ...
 ```
 
-11. Move QCD outputs using  `move_files_to_directories_illumina.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/move_files_to_directories_illumina.py -h`.
+> Move into your results folder and copy the Snakefiles, config, samples and cluster files to your plate directory.
+
+```
+(base) [dhatrib@gl3021 QCD]$ mv QCD.smk QCD_report.smk config/config.yaml config/samples.csv config/cluster.json /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/QCD_snakemake_pipeline
+(base) [dhatrib@gl3021 QCD]$ ls /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/QCD_snakemake_pipeline
+QCD.smk QCD_report.smk config.yaml samples.csv cluster.json
+```
+
+
+12. Once you have confirmed that the results has been moved (you should get an email from globus), you are now ready to move the results from QCD to the respective folders in your plate directory using `move_files_to_directories_illumina.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/move_files_to_directories_illumina.py -h`.
 
 ```
 (base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py -h
@@ -399,13 +425,13 @@ options:
                         esnitkin/Project_Marimba/Sequence_data/illumina_fastq/2024-12-24_Plate1-to-Plate3)
   --qcd_results_path QCD_RESULTS_PATH
                         Path to the QCD results directory (e.g.,
-                        /scratch/esnitkin_root/esnitkin1/dhatrib/QCD/results/Project_MDHHS_QCD)
+                        /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/)
 ```
 
-> Ensure you have the paths to your plate directory i.e. `/nfs/turbo/umms-esnitkin/Your_Project/Sequence_data/illumina_fastq/date_PlateNum` and QCD results i.e. `/scratch/esnitkin_root/esnitkin1/uniqame/QCD/results/Your_Project_QCD` handy.
+> Ensure you have the paths to your plate directory i.e. `/nfs/turbo/umms-esnitkin/Your_Project/Sequence_data/illumina_fastq/date_PlateNum` and QCD results i.e. `/nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/` handy.
 
 ```
-python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py --plate_info_path /nfs/turbo/umms-esnitkin/Your_project_folder/Sequence_data/illumina_fastq/your_newly_created_plate_dir --qcd_results_path /scratch/esnitkin_root/esnitkin1/uniqname/QCD/results/your_project_name_QCD
+python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py --plate_info_path /nfs/turbo/umms-esnitkin/Your_project_folder/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3 --qcd_results_path /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD
 ```
 
 **Your terminal window that you used to move the QCD outputs will be busy and it will take anywhere from 1-4 hours (sometimes more depending on the number of samples you have) to move the files. Please open another tab/terminal window if you need to contine using the terminal to work on other things.** 
