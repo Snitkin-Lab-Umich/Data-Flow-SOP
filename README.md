@@ -380,7 +380,7 @@ Once you have finished running QCD on your scratch directory and globus has succ
 2024-06-04_Project_Merlin_QCD_Report QCD_snakemake_pipeline  mlst  raw_coverage  spades ....
 ```
 
-11. Start and interative session and navigate to your QCD results folder.
+12. Start and interative session and navigate to your QCD results folder.
 
 > Start an interactive session. Increase/decrease `--cpus-per-task` and `--time` according to your sample size. 
 ```
@@ -410,7 +410,7 @@ QCD.smk QCD_report.smk config.yaml samples.csv cluster.json
 ```
 
 
-12. Once you have confirmed that the results has been moved (you should get an email from globus), you are now ready to move the results from QCD to the respective folders in your plate directory using `move_files_to_directories_illumina.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/move_files_to_directories_illumina.py -h`.
+13. Once you have confirmed that the results has been moved (you should get an email from globus), you are now ready to move the results from QCD to the respective folders in your plate directory using `move_files_to_directories_illumina.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/move_files_to_directories_illumina.py -h`.
 
 ```
 (base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py -h
