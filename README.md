@@ -1,5 +1,6 @@
 # Data Flow SOP
-The following are crucial steps as part of the [Snitkin lab](https://thesnitkinlab.com/index.php) Data Flow SOP. This project provides tools and workflows for processing Illumina, Nanopore, and hybrid sequencing samples. Depending on your dataset type, follow the respective guide for instructions.
+
+This repository outlines the steps for processing data as part of the [Snitkin Lab](https://thesnitkinlab.com/index.php) Data Flow Standard Operating Procedure (SOP). The Data Flow SOP details how to process your samples after they've been sequenced by either the Genomics Core or Plasmidsaurus. To begin, select the guide that corresponds to your sample type—Illumina, Nanopore, or hybrid (Illumina + Nanopore).
 
 ## Available Workflows
 
@@ -15,11 +16,12 @@ You can also explore the related scripts and files in the current directory:
 The necessary files for Nanopore workflow can be found in the `nanopore/` directory. If you're working with Nanopore sequencing data, please consult the guide below:
 - [Processing Nanopore Samples](processing-nanopore-samples.md)
 
-<!-- 
 ### 3. **Hybrid Samples (Illumina + Nanopore)**
-For hybrid samples that involve both Illumina and Nanopore data, use the following instructions:
-- [Processing Hybrid Samples](processing-hybrid-samples.md)
+*This section is coming soon.*
 
+<!-- For hybrid samples that involve both Illumina and Nanopore data, use the following instructions:
+- [Processing Hybrid Samples](processing-hybrid-samples.md)
+<!-- 
 Check the `hybrid/` directory for additional tools specific to hybrid workflows.
 -->
 ## Directory Structure
@@ -48,9 +50,7 @@ Data-Flow-SOP
 
 ```
 
-## Getting Started
-To start, choose the appropriate workflow based on your sequencing platform and follow the respective guide.
+To begin, select the appropriate workflow based on your sequencing method and follow the corresponding guide.
 
-For any questions or issues, please feel free to reach out to Dhatri or add an issue in the issues tab.
-
+For any questions or issues, please open an issue on [Github](https://github.com/Snitkin-Lab-Umich/Data-Flow-SOP/issues). For urgent inquiries, contact Dhatri on Slack or via email at dhatrib@umich.edu.
 
