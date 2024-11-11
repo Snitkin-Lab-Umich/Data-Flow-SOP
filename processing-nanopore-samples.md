@@ -42,7 +42,7 @@ git clone https://github.com/Snitkin-Lab-Umich/Data-Flow-SOP.git
 
 ```
 (base) [dhatrib@gl-login2 dhatrib]$ pwd
-/scratch/esnitkin_root/esnitkin99/dhatrib
+/scratch/esnitkin_root/esnitkin1/dhatrib
 (base) [dhatrib@gl-login2 dhatrib]$ git clone https://github.com/Snitkin-Lab-Umich/Data-Flow-SOP.git
 Cloning into 'Data-Flow-SOP'...
 remote: Enumerating objects: 11, done.
@@ -60,10 +60,10 @@ Resolving deltas: 100% (1/1), done.
 (base) [dhatrib@gl-login2 dhatrib]$ ls
 Data-Flow-SOP
 (base) [dhatrib@gl-login2 dhatrib]$ pwd
-/scratch/esnitkin_root/esnitkin99/dhatrib
+/scratch/esnitkin_root/esnitkin1/dhatrib
 (base) [dhatrib@gl-login2 dhatrib]$ cd Data-Flow-SOP/
 (base) [dhatrib@gl-login2 Data-Flow-SOP]$ pwd
-/scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP
+/scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP
 (base) [dhatrib@gl-login2 Data-Flow-SOP]$ ls
 create_directories.py        hybrid    nanopore  processing-hybrid-samples.md    processing-nanopore-samples.md
 create_higher_level_dirs.py  illumina  pics      processing-illumina-samples.md  README.md
@@ -238,7 +238,7 @@ Once the samples have been renamed, you are now ready to move them from temporar
 6. Run `create_directories.py` to create the relevant subdirectories in your Project folder. Type `python3 create_directories.py -h` on your terminal. This will give you an idea of all the flags present in the script and what you need to specify for each argument as seen below. 
 
 ```
-(base) [dhatrib@gl-login2 fastqs_test_illumina]$ python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/create_directories.py -h
+(base) [dhatrib@gl-login2 fastqs_test_illumina]$ python3 /scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP/create_directories.py -h
 usage: create_directories.py [-h] --dest_path DEST_PATH --project_name PROJECT_NAME --data_type {illumina,nanopore,both}
                              [--folder_names_illumina [FOLDER_NAMES_ILLUMINA]] [--folder_names_nanopore [FOLDER_NAMES_NANOPORE]]
 
@@ -264,7 +264,7 @@ options:
 > Create the batch folders and respective subdirectories in your project folder.
 
 ```
-python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/create_directories.py --dest_path /nfs/turbo/umms-esnitkin/ --project_name Project_Test_Nanopore_Org --data_type nanopore --folder_names_nanopore 2024-11-07_Batch1
+python3 /scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP/create_directories.py --dest_path /nfs/turbo/umms-esnitkin/ --project_name Project_Test_Nanopore_Org --data_type nanopore --folder_names_nanopore 2024-11-07_Batch1
 ```
 > If the directories were created successfully, you should see the following messages.
 
@@ -384,50 +384,50 @@ config    QCD.smk   QCD_report.smk README.md ...
 > Move into your results folder and copy the Snakefiles, config, samples and cluster files to your plate directory.
 
 ```
-(base) [dhatrib@gl3021 QCD]$ mv workflow/nanoQC.smk QCD_report.smk config/config.yaml config/samples.csv config/cluster.json /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/QCD_snakemake_pipeline
-(base) [dhatrib@gl3021 QCD]$ ls /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/QCD_snakemake_pipeline
-QCD.smk QCD_report.smk config.yaml samples.csv cluster.json
+(base) [dhatrib@gl3021 nanoQC]$ mv workflow/nanoQC.smk workflow/nanoQC_summary.smk config/config.yaml config/samples.csv config/cluster.json /nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/2024-11-07_Batch1/2024-10-28_Project_Cauris_nanoQC/nanoQC_snakemake_pipeline/
+(base) [dhatrib@gl3021 nanoQC]$ ls /nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/2024-11-07_Batch1/2024-10-28_Project_Cauris_nanoQC/nanoQC_snakemake_pipeline/
+nanoQC.smk nanoQC_summary.smk config.yaml samples.csv cluster.json
 ```
 
 
-13. Once you have confirmed that the results has been moved (you should get an email from globus), you are now ready to move the results from QCD to the respective folders in your plate directory using `move_files_to_directories_illumina.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/move_files_to_directories_illumina.py -h`.
+13. Once you have confirmed that the results has been moved (you should get an email from globus), you are now ready to move the results from nanoQC to the respective folders in your batch directory using `move_files_to_directories_nanopore.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/nanopore/move_files_to_directories_nanopore.py -h`.
 
 ```
-(base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py -h
-usage: move_files_to_directories_illumina.py [-h] --plate_info_path PLATE_INFO_PATH --qcd_results_path QCD_RESULTS_PATH
+(base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py -h
+usage: move_files_to_dirs_nanopore.py [-h] --batch_info_path BATCH_INFO_PATH --nanoQC_results_path NANOQC_RESULTS_PATH
 
-Process and organize illumina sequencing data.
+Process and organize nanopore and hybrid sequencing data.
 
 options:
   -h, --help            show this help message and exit
-  --plate_info_path PLATE_INFO_PATH
-                        Path to the date_PlateInfo directory (e.g., /nfs/turbo/umms-
-                        esnitkin/Project_Marimba/Sequence_data/illumina_fastq/2024-12-24_Plate1-to-Plate3)
-  --qcd_results_path QCD_RESULTS_PATH
-                        Path to the QCD results directory (e.g.,
-                        /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/)
+  --batch_info_path BATCH_INFO_PATH
+                        Path to the date_BatchInfo directory (e.g., /nfs/turbo/umms-esnitkin/Project_Marimba/Sequence_data/ONT/2024-12-24_Batch1)
+  --nanoQC_results_path NANOQC_RESULTS_PATH
+                        Path to the nanoQC results (e.g., /nfs/turbo/umms-esnitkin/Project_Marimba/Sequence_data/ONT/2024-12-24_Batch1/2024-12-24_Project_MDHHS_Nano_QC)
 ```
 
-> Ensure you have the paths to your plate directory i.e. `/nfs/turbo/umms-esnitkin/Your_Project/Sequence_data/illumina_fastq/date_PlateNum` and QCD results i.e. `/nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/` handy.
+> Ensure you have the paths to your batch directory i.e. `/nfs/turbo/umms-esnitkin/Your_Project/Sequence_data/ONT/date_BatchNum` and nanoQC outputs i.e. `/nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/2024-11-07_Batch1/2024-10-28_Project_Cauris_nanoQC/` handy.
 
 ```
-python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py --plate_info_path /nfs/turbo/umms-esnitkin/Your_project_folder/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3 --qcd_results_path /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD
+python3 /scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP/nanopore/move_files_to_directories_nanopore.py --batch_info_path /nfs/turbo/umms-esnitkin/Your_Project/Sequence_data/ONT/2024-11-07_BatchNum  --nanoQC_results_path /nfs/turbo/umms-esnitkin/Your_Project/Sequence_data/ONT/2024-11-07_BatchNum/date_Your_Project_nanoQC/
 ```
 
-**Your terminal window that you used to move the QCD outputs will be busy and it will take anywhere from 1-4 hours (sometimes more depending on the number of samples you have) to move the files. Please open another tab/terminal window if you need to contine using the terminal to work on other things.** 
+**Your terminal window that you used to move the nanoQC outputs will be busy and it should not take more than 10 minutes (sometimes more depending on the number of samples you have) to move the files. Please open another tab/terminal window if you need to contine using the terminal to work on other things.** 
 
 > The message you will see once your files have moved successfully.
 
 ```
-(base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py --plate_info_path /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3 --qcd_results_path /scratch/esnitkin_root/esnitkin1/dhatrib/Testing_dir_structure_illumina/results/2024-06-04_Project_Merlin_QCD
-Created master QC summary file at: /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/master_qc_summary.csv
-Appended /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/2024-06-04_Project_Merlin_QCD_Report/data/2024-06-04_Project_Merlin_QCD_QC_summary.csv to /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/master_qc_summary.csv
-Yay, all files were transferred to their respective folders successfully!
-Yay, samples from passed_samples.txt file have been moved to clean_fastq_qc_pass_samples directory!
-Yay, all specified samples have been moved to the assembly directory successfully!
+(base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP/nanopore/move_files_to_directories_nanopore.py --batch_info_path /nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/2024-11-07_Batch1  --nanoQC_results_path /nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/2024-11-07_Batch1/2024-10-28_Project_Cauris_nanoQC
+
+Created master QC summary file at: /nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/master_qc_summary.csv
+
+Appended /nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/2024-11-07_Batch1/2024-10-28_Project_Cauris_nanoQC/2024-10-28_Project_Cauris_nanoQC_report/2024-10-28_Project_Cauris_nanoQC_report.csv to /nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/master_qc_summary.csv
+Yay, passed and failed sample files were transferred to their respective folders successfully!
+
+Yay, samples from passed_samples.txt file have been moved to clean_fastq_qc_pass_samples directory and all specified samples have been moved to the assembly directory successfully!
 ```
 
-***If you see the above message, you have finished QC-ing your short reads and are ready to move forward with downstream analysis. Happy sciencing!***
+***If you see the above message, you have finished QC-ing your long reads and are ready to move forward with downstream analysis. Happy sciencing!***
 
 <!-- >
 ### Rule of thumb(s):
