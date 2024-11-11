@@ -5,7 +5,7 @@ Author: Dhatri Badri
 # Processing illumina samples
 The following are crucial steps as part of the [Snitkin lab](https://thesnitkinlab.com/index.php) SOP to process Illumina data (short reads). 
 
-_**COMING SOON**: To understand which scripts are being called and executed, and the different directories/folders being created, please refer to the [wiki]()._
+_**COMING SOON**: To understand which scripts are being called and executed, and the different directories/folders being created, please refer to the [wiki](https://github.com/Snitkin-Lab-Umich/Data-Flow-SOP/wiki)._
 
 - [Processing illumina samples](#processing-illumina-samples)
   - [Getting started](#getting-started)
@@ -20,9 +20,9 @@ _**COMING SOON**: To understand which scripts are being called and executed, and
 
 
 ## Getting started
-You need to install the Data Flow SOP from Github and follow the directions in this document to create your project folder on turbo. _Your project folder is the name of the project you are currently working on. For example, if you are working on the MDHHS project, there is a folder called_ `Project_MDHHS` on `/nfs/turbo/umms-esnitkin/`. _**If you are unable to find your project folder (rare), please slack Evan to check if exists or if it needs to be created. If the project folder does not exist, you will have the opportunity to create it further along the SOP.**_ <!--If your project folder is already created,great—that's one less step for you to do!-->
+Firstly, you need to install the Data Flow repository from Github and follow the directions in this document to create your project folder on turbo. Your project folder is the name of the project you are currently working on. For example, if you are working on the MDHHS project, there is a folder called `Project_MDHHS_genomics` on `/nfs/turbo/umms-esnitkin/`. _**If you are unable to find your project folder (rare), please slack Evan to check if exists or if it needs to be created. If the project folder does not exist, you will have the opportunity to create it further along the SOP.**_ 
 
-Please ensure you are cloning the Github repository on your scratch i.e. `/scratch/esnitkin_root/esnitkin1/your_uniqname/`. **All the steps in this SOP depend on your successful completion of the preceding steps.** If you are unable to find the relevant files and/or the instructions are unclear, **_please slack Dhatri and do not move forward with the SOP_**.  <!--This script should be run in the directory you are currently in but the path you give is the path to your (already/newly created) project folder on turbo. -->
+Please ensure you are cloning the Github repository on your scratch directory i.e. `/scratch/esnitkin_root/esnitkin1/your_uniqname/`. **All the steps in this SOP depend on your successful completion of the preceding steps.** If you are unable to find the relevant scripts and/or the instructions are unclear, **_please slack Dhatri and do not move forward with the SOP_**. 
 
 
 ### Installation
@@ -65,8 +65,8 @@ Data-Flow-SOP
 (base) [dhatrib@gl-login2 Data-Flow-SOP]$ pwd
 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP
 (base) [dhatrib@gl-login2 Data-Flow-SOP]$ ls
-create_directories.py  move_files_to_directories_illumina.py  README.md  rename_samples.sh
-
+create_directories.py        hybrid    nanopore  processing-hybrid-samples.md    processing-nanopore-samples.md
+create_higher_level_dirs.py  illumina  pics      processing-illumina-samples.md  README.md
 ```
 
 ## Create project folder 
@@ -75,7 +75,7 @@ create_directories.py  move_files_to_directories_illumina.py  README.md  rename_
 
 _**If you project folder does not exist, follow the steps below.**_ 
 
-The following script, `create_higher_level_dirs.py`, will create your Project folder for you. <!--This script will be used for newer projects—most likely, your project folder has already been created. **Do not install tools/run any computationally intensive tasks on turbo i.e. `/nfs/turbo/umms-esnitkin/`**. -->
+The following script, `create_higher_level_dirs.py`, will create your Project folder for you. <!--This script will be used for newer projects—most likely, your project folder has already been created. -->
 
 
 1. To get started, type this command `python3 create_higher_level_dirs.py -h`. This will give you an idea of all the flags present in the script and what you need to specify for each argument as seen below. 
@@ -98,7 +98,7 @@ options:
                         Type of data (illumina/nanopore/both)
 ```
 
-2. Create project folder and its relevant sub-directories. <!-- If your project folder already exists, this script will create the relevant subdirectories in that folder. --> _This script is case-sensitive—if you wanted to create the Project name `MERLIN` but gave `MERLiN` it will create the directories in `/nfs/turbo/umms-esnitkin/Project_MERLiN`, instead of `/nfs/turbo/umms-esnitkin/Project_MERLIN`._
+2. Create project folder and its relevant sub-directories. <!-- If your project folder already exists, this script will create the relevant subdirectories in that folder. --> _This script is case-sensitive—if you want to create Project folder  called `MERLIN` but gave `MERLiN` instead, the script will create the directories for `Project_MERLiN` instead of `Project_MERLIN`._
 
 > The `--dest_path` should be the path to turbo on Great Lakes i.e. `/nfs/turbo/umms-esnitkin/`, `--project_name` should be the name of your project and `--data_type` is illumina. 
 
@@ -122,7 +122,7 @@ Created Illumina directory structure under /nfs/turbo/umms-esnitkin/Project_Test
 Success! All specified directories have been created.
 ```
 
-3. Visualize Project directory structure: `tree /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org` to look at the Project folder and relevant directories created.
+3. Visualize Project directory structure: `tree /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org` to look at the Project folder and relevant directories/subdirectories created.
 
 ```
 (base) [dhatrib@gl-login3 Data-Flow-SOP]$ tree /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org
@@ -168,7 +168,7 @@ cd your/samples/folder
 DemuxStats_Test_Illumina_Org.csv  fastqs_test_illumina  README.md
 ```
 
-> If your samples do not have this suffix `*_R{1/2}_001.fastq.gz`, like the samples below, you will not be able to rename the samples using `rename_samples.sh`. **Do not continue. Slack Dhatri for assistance.**
+> Before you rename the samples, confirm the existence of the sequencing reads in `fastqs_test_illumina`.
 
 ```
 (base) [dhatrib@gl-login3 test_illumina_org]$ ls fastqs_test_illumina/
@@ -179,18 +179,20 @@ Test_Illumina_Org_2_R2_001.fastq.gz  Test_Illumina_Org_5_R1_001.fastq.gz  TEST_N
 Test_Illumina_Org_3_R1_001.fastq.gz  Test_Illumina_Org_5_R2_001.fastq.gz
 ```
 
-> If your samples have the aforementioned prefix, rename samples using `rename_samples_illumina.sh`. To understand how to use the bash script, execute the following command
+> Rename samples using `rename_samples_illumina.sh`. To understand how to use the bash script, execute the following command: `/scratch/esnitkin_root/esnitkin1/uniqname/Data-Flow-SOP/illumina/rename_samples_illumina.sh `
 
 ```
-/scratch/esnitkin_root/esnitkin1/path/to/Data-Flow-SOP/illumina/rename_samples_illumina.sh 
+(base) [dhatrib@gl-login3 test_illumina_org]$ /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/illumina/rename_samples_illumina.sh 
+Usage: illumina/rename_samples_illumina.sh <fastq_directory> <DemuxStats_*.csv>
 ```
 
-
-> You will need to supply the name of the folder that contains the fastqs and a lookup file called `DemuxStats_*.csv` where the **_*_** is the name of your dataset. If you are unable to find the fastq folder and/or the lookup file, **please do not move forward with the following steps and slack Evan**. 
+> You will need to supply the name of the folder that contains the fastqs and a lookup file called `DemuxStats_*.csv` where  **_*_** is the name of your dataset. If you are unable to find the fastq folder and/or the Demultiplex file, **please do not move forward with the following steps and slack Evan**. 
 
 ```
 /scratch/esnitkin_root/esnitkin1/path/to/Data-Flow-SOP/illumina/rename_samples_illumina.sh fastq_folder DemuxStats_*.csv
 ```
+
+> If you successfully renamed the samples, you should see the following message.
 
 ```
 (base) [dhatrib@gl-login2 test_illumina_org]$ /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/illumina/rename_samples_illumina.sh fastqs_test_illumina/ DemuxStats_Test_Illumina_Org.csv 
@@ -201,13 +203,7 @@ Renaming sample /nfs/turbo/umms-esnitkin/Raw_sequencing_data/test_illumina_org/f
 Renaming completed. Check renamed_file_commands.sh for details.
 ```
 
-5. The samples should have been renamed. There will be a new file generated called `renamed_file_commands.sh`. This file contains a bunch of move commands (`mv`) that show the names of the old files and their corresponding renamed file names. 
-
-> Check if the file has been created: 
-
-```
-ls /nfs/turbo/umms-esnitkin/Raw_sequencing_data/your/samples/folder
-```
+5. As part of the renaming process, `renamed_file_commands.sh` would have been created. This file contains  `mv` commands that show the names of the old files and their corresponding renamed file names. 
 
 > Confirm the creation of `renamed_file_commands.sh`
 
@@ -240,7 +236,7 @@ cd fastq_folder
 ls
 ```
 
-> Samples have been renamed and we can move to the next step in the SOP.
+> Samples have been renamed and we can move on to the next step in the SOP.
 
 ```
 (base) [dhatrib@gl-login2 test_illumina_org]$ cd fastqs_test_illumina/
@@ -249,11 +245,11 @@ MERLIN_107_R1.fastq.gz  MERLIN_10_R1.fastq.gz  MERLIN_111_R1.fastq.gz  MERLIN_11
 MERLIN_107_R2.fastq.gz  MERLIN_10_R2.fastq.gz  MERLIN_111_R2.fastq.gz  MERLIN_114_R2.fastq.gz  MERLIN_1_R2.fastq.gz  TEST_NEG_CTL_21_R2.fastq.gz
 ```
 
-_**STOP AND CHECK**_: If there are some files that have not been renamed, please slack Dhatri immediately and do not move forward with the following steps.
+_**STOP AND CHECK**_: If there are files that have not been renamed or you receive this message `Error: no files were nrenamed!`, please slack Dhatri immediately and do not move forward with the following steps.
 
 ## Create plate directory to house the renamed samples
 
-Once the samples have been renamed, you are now ready to move them from temporary storage `Raw_sequencing_data/dataset_folder/fastq_folder` to a more permanent location—your Project folder `/nfs/turbo/umms-esnitkin/Project_Name`. 
+Once the samples have been renamed, you are now ready to move them from temporary storage `../Raw_sequencing_data/dataset_folder/fastq_folder` to a more permanent location—your Project folder `/nfs/turbo/umms-esnitkin/Project_Name`. 
 
 6. Run `create_directories.py` to create the relevant subdirectories in your Project folder. Type `python3 create_directories.py -h` on your terminal. This will give you an idea of all the flags present in the script and what you need to specify for each argument as seen below. 
 
@@ -281,7 +277,7 @@ options:
 ```
 **_If you are unsure which plate(s) your samples are from, click [here](https://docs.google.com/spreadsheets/d/1L4ic5RthXNmEkHlSogRKZghZ0EPi2UT3ri6RUaguQEU/edit?gid=2116112669#gid=2116112669). If you are unable to open the link, slack Evan for access to the excel._**
 
-> Create the plate folders and its subdirectories in your project folder.
+> Create the necessary plate directories in your project folder.
 
 ```
 python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/create_directories.py --dest_path /nfs/turbo/umms-esnitkin/ --project_name Project_Test_Illumina_Org --data_type illumina --folder_names_illumina 2024-08-21_Plate1-to-Plate3
@@ -332,13 +328,13 @@ _**STOP AND CHECK**_: If your plate directory aka `../Sequence_data/illumina_fas
 
 
 ## Move renamed samples to Project folder 
-8. Before you move QCD outputs, to relevant directories on Project folder i.e. the path to your Project folder on turbo. 
+8. You are now ready to move the raw reads from `Raw_sequencing_data` to your project folder.
 
 > Log onto [globus](https://app.globus.org/file-manager?two_pane=true). Move only the fastq files from  `/nfs/turbo/umms-esnitkin/Raw_sequencing_data/test_illumina_org/fastqs_test_illumina/` to the `raw_fastq` folder in your Project folder on turbo i.e. `/nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/raw_fastq`
 
 ![image](pics/globus_raw_fastq.png)
 
-> Move the rest of the files found in your dataset folder `mv README.md renamed_file_commands.sh DemuxStats_Test_Illumina_Org.csv /nfs/turbo/umms-esnitkin/Project_Name/Sequence_data/metadata/sample_lookup` to the `metadata/sample_lookup` folder. E.g. of files that can be found the Demultiplex lookup file (`DemuxStats_*.csv`), `README` (if applicable), `renamed_file_commands.sh`.  
+> Move the rest of the files found in `../Raw_sequencing_data/test_illumina_org` to your project folder `../Sequence_data/metadata/sample_lookup`. Example of files that can be found are: Demultiplex file (`DemuxStats_*.csv`), `README` (if applicable), and `renamed_file_commands.sh`.  
 
 ```
 (base) [dhatrib@gl-login3 test_illumina_org]$ ls
@@ -355,7 +351,7 @@ DemuxStats_Test_Illumina_Org.csv  README.md  renamed_file_commands.sh
 
 ## Run QCD
 
-9. You are now ready to start processing your short reads. We will be using one of our in house pipelines, [QCD](https://github.com/Snitkin-Lab-Umich/QCD), to run on the renamed samples. Click on the link and follow the instructions as described on the Github page. _**Note: QCD can only be run on samples one species at a time.**_
+9. You are now ready to start processing your short reads. We will be using one of our in house pipelines—[QCD](https://github.com/Snitkin-Lab-Umich/QCD)—to run on the renamed samples. Click on the link and follow the instructions as described on the Github page. 
 
 _**STOP AND CHECK**_: If you run into any issues running QCD, please slack Dhatri immediately and do not move forward with the following steps. Ensure you have generated the QC report before moving on.
 
@@ -369,7 +365,7 @@ Once you have finished running QCD on your scratch directory and globus has succ
 
 ![image](pics/transfer-qcd-results.png)
 
-11. Once you have confirmed that the results has been moved (you should get an email from globus), create a folder, `QCD_snakemake_pipeline`, in your newly moved results folder here `/nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/`.
+11. Once you have confirmed that the results have been moved (you should get an email from globus), create a folder, `QCD_snakemake_pipeline`, in your newly moved results folder here `/nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD/`.
 
 > `cd` into your QCD results folder and create a new folder `QCD_snakemake_pipeline`.
 
@@ -384,7 +380,7 @@ Once you have finished running QCD on your scratch directory and globus has succ
 
 > Start an interactive session. Increase/decrease `--cpus-per-task` and `--time` according to your sample size. 
 ```
-srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=3 --time=7:00:00 --pty /bin/bash
+srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=3 --time=2:00:00 --pty /bin/bash
 ```
 
 > Ensure you are in the right directory.
@@ -394,7 +390,7 @@ cd /scratch/esnitkin_root/esnitkin1/uniqname/path/to/QCD
 
 > This is what you should be seeing after finishing the 2 steps above. 
 ```
-(base) [dhatrib@gl-login3 QCD]$ srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=3 --time=8:00:00 --pty /bin/bash
+(base) [dhatrib@gl-login3 QCD]$ srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=3 --time=2:00:00 --pty /bin/bash
 srun: job 12759868 queued and waiting for resources
 srun: job 12759868 has been allocated resources
 (base) [dhatrib@gl3021 QCD]$ ls
@@ -410,7 +406,7 @@ QCD.smk QCD_report.smk config.yaml samples.csv cluster.json
 ```
 
 
-13. Once you have confirmed that the results has been moved (you should get an email from globus), you are now ready to move the results from QCD to the respective folders in your plate directory using `move_files_to_directories_illumina.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/move_files_to_directories_illumina.py -h`.
+13. If you have confirmed the successfull transfer of QCD results from your scratch to your project folder, you are now ready to move the QCD results locally within your plate directory using `move_files_to_directories_illumina.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/move_files_to_directories_illumina.py -h`.
 
 ```
 (base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/illumina/move_files_to_directories_illumina.py -h
@@ -434,7 +430,7 @@ options:
 python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/illumina/move_files_to_directories_illumina.py --plate_info_path /nfs/turbo/umms-esnitkin/Your_project_folder/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3 --qcd_results_path /nfs/turbo/umms-esnitkin/Project_Test_Illumina_Org/Sequence_data/illumina_fastq/2024-08-21_Plate1-to-Plate3/2024-06-04_Project_Merlin_QCD
 ```
 
-**Your terminal window that you used to move the QCD outputs will be busy and it will take anywhere from 1-4 hours (sometimes more depending on the number of samples you have) to move the files. Please open another tab/terminal window if you need to contine using the terminal to work on other things.** 
+**Your terminal window that you used to move the QCD outputs will be busy and it will take anywhere from 2-20 minutes (sometimes more depending on the number of samples you have) to move the files. Please open another tab/terminal window if you need to contine using the terminal to work on other things.** 
 
 > The message you will see once your files have moved successfully.
 
@@ -447,7 +443,7 @@ Yay, samples from passed_samples.txt file have been moved to clean_fastq_qc_pass
 Yay, all specified samples have been moved to the assembly directory successfully!
 ```
 
-***If you see the above message, you have finished QC-ing your short reads and are ready to move forward with downstream analysis. Happy sciencing!***
+***If you see the above message, you have finished QC-ing your short reads and are ready to move forward with downstream analysis. Happy science-ing!***
 
 <!-- >
 ### Rule of thumb(s):
