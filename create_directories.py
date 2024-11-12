@@ -44,7 +44,7 @@ class CustomArgumentParser(argparse.ArgumentParser):
         return close_matches[0] if close_matches else None
 
 def main():
-    parser = CustomArgumentParser(description="Create directory structure for illumina data.")
+    parser = CustomArgumentParser(description="Create directory structure for illumina and nanopore data.")
     parser.add_argument("--dest_path", required=True, help="Destination path where directories need to be created—do NOT include project name (e.g., /nfs/turbo/umms-esnitkin/)")
     parser.add_argument("--project_name", required=True, help="Name of your project (format: Project_Name-of-Project, e.g., Project_MDHHS)")
     parser.add_argument("--data_type", choices=["illumina", "nanopore", "both"], required=True, help="Type of data (illumina/nanopore/both)")
@@ -76,7 +76,7 @@ def main():
     create_assembly_structure(project_path, data_type)
 
     # Create directories if validation passes
-    if data_type in ["illumina", "both"]:
+    if data_type in ["illumina"]:
         process_folders(project_path, "illumina", folder_names_illumina)
 
     elif data_type in ["both"]:
@@ -120,10 +120,10 @@ def create_assembly_structure(project_path, data_type):
         elif data_type in ["both"]:
             illumina_path = os.path.join(assembly_path, "illumina")
             ont_path = os.path.join(assembly_path, "ONT")
-            #hybrid_path = os.path.join(assembly_path, "hybrid")
+            hybrid_path = os.path.join(assembly_path, "hybrid")
             os.makedirs(illumina_path, exist_ok=True)
             os.makedirs(ont_path, exist_ok=True)
-            #os.makedirs(hybrid_path, exist_ok=True)
+            os.makedirs(hybrid_path, exist_ok=True)
         
         else: #data_type in ["nanopore", "both"]:
             ont_path = os.path.join(assembly_path, "ONT")          
@@ -162,7 +162,7 @@ def process_folders(project_path, data_type, folder_names):
 def validate_folders(parser, project_path, data_type, folder_names_illumina, folder_names_nanopore):
     valid = True
 
-    if data_type in ["illumina"]:
+    if data_type == "illumina":
         if folder_names_illumina:
             for folder_name in folder_names_illumina.split(','):
                 if not re.match(r'^\d{4}-\d{2}-\d{2}_Plate\d+(-to-Plate\d+)?$', folder_name.strip()):
@@ -181,18 +181,10 @@ def validate_folders(parser, project_path, data_type, folder_names_illumina, fol
             return False
         
         else:
-            parser.error(f"\nComma separated folder names for Illumina are required.")
+            parser.error(f"\nComma separated folder names for Illumina are required. Additional argument is required: --folder_names_illumina")
             return False                
-               
-        #if not folder_names_illumina:
-            #print("\nComma separated folder names for Illumina are required.")
-            #return False
-        
-        #if folder_names_illumina and folder_names_nanopore:
-            #print("\nOops, looks like you gave two arguments: --folder_names_illumina and --folder_names_nanopore. Please use the right argument: --folder_names_illumina")
-            #return False
 
-    if data_type in ["nanopore"]:
+    elif data_type == "nanopore":
         if folder_names_nanopore:
             for folder_name in folder_names_nanopore.split(','):
                 if not re.match(r'^\d{4}-\d{2}-\d{2}_Batch\d+(-to-Batch\d+)?(_rerun)?$', folder_name.strip()):
@@ -211,51 +203,41 @@ def validate_folders(parser, project_path, data_type, folder_names_illumina, fol
             return False
          
         else:
-            parser.error(f"\nComma separated folder names for Nanopore are required.")
+            parser.error(f"\nComma separated folder names for Nanopore are required. Additional argument is required: --folder_names_nanopore")
             return False 
 
-        #if not folder_names_nanopore and folder_names_illumina:
-            #print("\nOops, looks like you gave --folder_names_illumina instead of --folder_names_nanopore. Please use the right argument: --folder_names_nanopore")
-            #return False
-
-        #if not folder_names_nanopore:
-            #print("\nComma separated folder names for Nanopore are required.")
-            #return False
+    elif data_type == "both":
+        if not folder_names_illumina and not folder_names_nanopore:
+            print("\nComma separated folder names for Illumina and ONT are required. The following arguments are required: --folder_names_illumina AND --folder_names_nanopore")
+            return False
         
-        #if folder_names_nanopore and folder_names_illumina:
-            #print("\nOops, looks like you gave two arguments: --folder_names_nanopore and --folder_names_illumina. Please use the right argument: --folder_names_nanopore")
-            #return False
-    
+        if not folder_names_illumina:
+            parser.error("\nComma separated folder names for Illumina are required. Additional argument is required: --folder_names_illumina ")
+            return False
 
-    if data_type in ["both"]:
-        if folder_names_illumina and not folder_names_nanopore:
-            for folder_name in folder_names_illumina.split(','):
-                folder_path = os.path.join(project_path, "Sequence_data", "illumina_fastq", folder_name.strip())
-                if os.path.exists(folder_path):
-                    print(f"The folder name '{folder_name}' already exists under {project_path}/Sequence_data/illumina_fastq/. Please choose a different folder name.\n")
-                    valid = False
-        
-            for folder_name in folder_names_nanopore.split(','):
-                folder_path = os.path.join(project_path, "Sequence_data", "ONT", folder_name.strip())
-                if os.path.exists(folder_path):
-                    print(f"The folder name '{folder_name}' already exists under {project_path}/Sequence_data/ONT/. Please choose a different folder name.\n")
-                    valid = False
-        else:
-            print("\nComma separated folder names for Illumina and ONT are required. The following arguments are required: --folder_names_illumina and --folder_names_nanopore")
-            return False 
+        if not folder_names_nanopore:
+            parser.error("\nComma separated folder names for Nanopore are required. Additional argument is required: --folder_names_nanopore")
+            return False
 
-        #if not folder_names_illumina:
-            #print("\nComma separated folder names for Illumina are required.")
-            #return False
+        for folder_name in folder_names_illumina.split(','):
+            if not re.match(r'^\d{4}-\d{2}-\d{2}_Plate\d+(-to-Plate\d+)?$', folder_name.strip()):
+                parser.error(f"\nInvalid format for Illumina folder name: {folder_name}. Format should be 'year-month-day_PlateNumber-to-PlateNumber'.")
+                return False
 
-        #if not folder_names_nanopore:
-            #print("\nComma separated folder names for Nanopore are required.")
-            #return False
+            folder_path = os.path.join(project_path, "Sequence_data", "illumina_fastq", folder_name.strip())
+            if os.path.exists(folder_path):
+                parser.error(f"\nThe folder name '{folder_name}' already exists under {project_path}/Sequence_data/illumina_fastq/. Please choose a different folder name.")
+                valid = False
 
-        #if not folder_names_illumina and not folder_names_nanopore:
-        #    print("\nComma separated folder names for Illumina and ONT are required. The following arguments are required: --folder_names_illumina and --folder_names_nanopore")
-        #    return False
-        
+        for folder_name in folder_names_nanopore.split(','):
+            if not re.match(r'^\d{4}-\d{2}-\d{2}_Batch\d+(-to-Batch\d+)?(_rerun)?$', folder_name.strip()):
+                parser.error(f"\nInvalid format for ONT folder name: {folder_name}. Format should be 'year-month-day_BatchNum-to-BatchNum', 'year-month-day_BatchNum-to-BatchNum_rerun', 'year-month-day_BatchNum', or 'year-month-day_BatchNum_rerun'.")
+                return False
+
+            folder_path = os.path.join(project_path, "Sequence_data", "ONT", folder_name.strip())
+            if os.path.exists(folder_path):
+                parser.error(f"\nThe folder name '{folder_name}' already exists under {project_path}/Sequence_data/ONT/. Please choose a different folder name.")
+                valid = False
 
     return valid
 
