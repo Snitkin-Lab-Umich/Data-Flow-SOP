@@ -210,8 +210,8 @@ def move_passed_samples_nano_qc(batch_info_path, clean_fastq_qc_pass_samples_dir
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Process and organize nanopore and hybrid sequencing data.")
-    parser.add_argument("--batch_info_path", required=True, help="Path to the date_BatchInfo directory (e.g., /nfs/turbo/umms-esnitkin/Project_Marimba/Sequence_data/ONT/2024-12-24_Batch1")
+    parser = argparse.ArgumentParser(description="Process and organize nanopore sequencing data.")
+    parser.add_argument("--batch_info_path", required=True, help="Path to the date_BatchInfo directory (e.g., /nfs/turbo/umms-esnitkin/Project_Marimba/Sequence_data/ONT/2024-12-24_Batch1)")
     parser.add_argument("--nanoQC_results_path", required=True, help="Path to the nanoQC results  (e.g., /nfs/turbo/umms-esnitkin/Project_Marimba/Sequence_data/ONT/2024-12-24_Batch1/2024-12-24_Project_MDHHS_Nano_QC)")
 
     args = parser.parse_args()
