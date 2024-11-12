@@ -14,16 +14,15 @@ _**COMING SOON**: To understand which scripts are being called and executed, and
   - [Rename samples](#rename-samples)
   - [Create batch directory](#create-batch-directory-to-house-the-renamed-samples)
   - [Move samples to Project directory](#move-renamed-samples-to-project-folder)
-  - [Run nanoQC](#run-qcd)
-  - [Move nanoQC outputs to Project directory](#move-qcd-outputs-to-project-directory)
+  - [Run nanoQC](#run-nanoqc)
+  - [Move nanoQC outputs to Project directory](#move-nanoqc-results-to-project-directory)
 
 
 
 ## Getting started
-You need to install the Data Flow SOP from Github and follow the directions in this document to create your project folder on turbo. _Your project folder is the name of the project you are currently working on. For example, if you are working on the MDHHS project, there is a folder called_ `Project_MDHHS` on `/nfs/turbo/umms-esnitkin/`. _**If you are unable to find your project folder (rare), please slack Evan to check if exists or if it needs to be created. If the project folder does not exist, you will have the opportunity to create it further along the SOP.**_ <!--If your project folder is already created,great—that's one less step for you to do!-->
+Firstly, you need to install the Data Flow repository from Github and follow the directions in this document to create your project folder on turbo. Your project folder is the name of the project you are currently working on. For example, if you are working on the MDHHS project, there is a folder called `Project_MDHHS_genomics` on `/nfs/turbo/umms-esnitkin/`. _**If you are unable to find your project folder (rare), please slack Evan to check if exists or if it needs to be created. If the project folder does not exist, you will have the opportunity to create it further along the SOP.**_ 
 
-Please ensure you are cloning the Github repository on your scratch i.e. `/scratch/esnitkin_root/esnitkin1/your_uniqname/`. **All the steps in this SOP depend on your successful completion of the preceding steps.** If you are unable to find the relevant files and/or the instructions are unclear, **_please slack Dhatri and do not move forward with the SOP_**.  <!--This script should be run in the directory you are currently in but the path you give is the path to your (already/newly created) project folder on turbo. -->
-
+Please ensure you are cloning the Github repository on your scratch directory i.e. `/scratch/esnitkin_root/esnitkin1/your_uniqname/`. **All the steps in this SOP depend on your successful completion of the preceding steps.** If you are unable to find the relevant scripts and/or the instructions are unclear, **_please slack Dhatri and do not move forward with the SOP_**. 
 
 ### Installation
 
@@ -85,20 +84,19 @@ The following script, `create_higher_level_dirs.py`, will create your Project fo
 (base) [dhatrib@gl-login3 Data-Flow-SOP]$ python3 create_higher_level_dirs.py -h
 usage: create_higher_level_dirs.py [-h] --dest_path DEST_PATH --project_name PROJECT_NAME --data_type {illumina,nanopore,both}
 
-Create project folder and higher level directory structure for illumina data.
+Create project folder and higher level directory structure for illumina and nanopore data.
 
 options:
   -h, --help            show this help message and exit
   --dest_path DEST_PATH
-                        Destination path where directories need to be created—do NOT include project name (e.g., /nfs/turbo/umms-
-                        esnitkin/)
+                        Destination path where directories need to be created—do NOT include project name (e.g., /nfs/turbo/umms-esnitkin/)
   --project_name PROJECT_NAME
                         Name of your project (format: Project_Name-of-Project, e.g., Project_MDHHS)
   --data_type {illumina,nanopore,both}
                         Type of data (illumina/nanopore/both)
 ```
 
-2. Create project folder and its relevant sub-directories. <!-- If your project folder already exists, this script will create the relevant subdirectories in that folder. --> _This script is case-sensitive—if you wanted to create the Project name `MERLIN` but gave `MERLiN` it will create the directories in `/nfs/turbo/umms-esnitkin/Project_MERLiN`, instead of `/nfs/turbo/umms-esnitkin/Project_MERLIN`._
+2. Create project folder and its relevant sub-directories. <!-- If your project folder already exists, this script will create the relevant subdirectories in that folder. --> _This script is case-sensitive—if you want to create Project folder  called `MERLIN` but gave `MERLiN` instead, the script will create the directories for `Project_MERLiN`, `/nfs/turbo/umms-esnitkin/Project_MERLiN`, instead of `Project_MERLIN`, `/nfs/turbo/umms-esnitkin/Project_MERLIN`._
 
 > The `--dest_path` should be the path to turbo on Great Lakes i.e. `/nfs/turbo/umms-esnitkin/`, `--project_name` should be the name of your project and `--data_type` is nanopore. 
 
@@ -146,7 +144,7 @@ If your Project directory looks like the above, you are ready to move to the nex
 
 ## Rename samples
 
-4. Once you have created the Project folder/confirmed the existence of an already created Project folder, navigate to this directory `/nfs/turbo/umms-esnitkin/Raw_sequencing_data/` and find the folder corresponding to your dataset. Rename samples using demultiplex file `DemuxStats_*.csv`. 
+4. Once you have created the Project folder/confirmed the existence of an already created Project folder, navigate to this directory `/nfs/turbo/umms-esnitkin/Raw_sequencing_data/` and find the folder corresponding to your dataset. Rename samples using demultiplex file `*_sample_lookup.csv`. 
 
 > Move to `Raw_sequencing_data` folder and navigate to your corresponding dataset folder.
 
@@ -165,7 +163,7 @@ cd your/samples/folder
 11143-ES  98CML4_results  B5JNZD_results  N3TG4Y_fastq                        S6HSTY_1        VTVLPR_results     ZJ9XL5_results
 (base) [dhatrib@gl-login3 Raw_sequencing_data]$ cd test_nanopore_org/
 (base) [dhatrib@gl-login3 test_nanopore_org]$ ls
-test_1.fastq.gz  test_2.fastq.gz  test_3.fastq.gz  test_sample_lookup.tsv
+test_1.fastq.gz  test_2.fastq.gz  test_3.fastq.gz  test_sample_lookup.csv
 ```
 
 
@@ -175,14 +173,14 @@ test_1.fastq.gz  test_2.fastq.gz  test_3.fastq.gz  test_sample_lookup.tsv
 /scratch/esnitkin_root/esnitkin1/path/to/Data-Flow-SOP/nanopore/rename_samples_nanopore.sh 
 ```
 
-
 > You will need to supply the name of the folder that contains the fastqs and a lookup file called `*_sample_lookup.csv` where the **_*_** is the name of your dataset. If you are unable to find the fastq folder and/or the lookup file, **please do not move forward with the following steps and slack Evan**. 
 
 ```
 /scratch/esnitkin_root/esnitkin1/path/to/Data-Flow-SOP/rename_samples.sh fastq_folder *_sample_lookup.csv Batch_X
 ```
-
+> Find out the batch number i.e. `Batch_Number` from `*_sample_lookup.csv`. If you successfully renamed the samples, you should see the following message.
 ```
+(base) [dhatrib@gl-login2 test_nanopore_org]$ less test_sample_lookup.csv
 (base) [dhatrib@gl-login2 test_nanopore_org]$ /scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP/nanopore/rename_samples_nanopore.sh . test_sample_lookup.csv Batch_1
 Renaming sample ./test_1.fastq.gz to ./cauris_1.fastq.gz
 Renaming sample ./test_2.fastq.gz to ./cauris_2.fastq.gz
@@ -190,13 +188,8 @@ Renaming sample ./test_3.fastq.gz to ./cauris_3.fastq.gz
 Renaming completed. Check renamed_file_commands.sh for details.
 ```
 
-5. The samples should have been renamed. There will be a new file generated called `renamed_file_commands.sh`. This file contains a bunch of move commands (`mv`) that show the names of the old files and their corresponding renamed file names. 
+5. As part of the renaming process, `renamed_file_commands.sh` would have been created. This file contains  `mv` commands that show the names of the old files and their corresponding renamed file names. 
 
-> Check if the file has been created: 
-
-```
-ls /nfs/turbo/umms-esnitkin/Raw_sequencing_data/your/samples/folder
-```
 
 > Confirm the creation of `renamed_file_commands.sh`
 
@@ -233,16 +226,16 @@ _**STOP AND CHECK**_: If there are some files that have not been renamed, please
 
 ## Create batch directory to house the renamed samples
 
-Once the samples have been renamed, you are now ready to move them from temporary storage `Raw_sequencing_data/dataset_folder/fastq_folder` to a more permanent location—your Project folder `/nfs/turbo/umms-esnitkin/Project_Name`. 
+Once the samples have been renamed, you are now ready to move them from temporary storage `../Raw_sequencing_data/dataset_folder/fastq_folder` to a more permanent location—your Project folder `/nfs/turbo/umms-esnitkin/Project_Name`.
 
 6. Run `create_directories.py` to create the relevant subdirectories in your Project folder. Type `python3 create_directories.py -h` on your terminal. This will give you an idea of all the flags present in the script and what you need to specify for each argument as seen below. 
 
 ```
 (base) [dhatrib@gl-login2 fastqs_test_illumina]$ python3 /scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP/create_directories.py -h
-usage: create_directories.py [-h] --dest_path DEST_PATH --project_name PROJECT_NAME --data_type {illumina,nanopore,both}
-                             [--folder_names_illumina [FOLDER_NAMES_ILLUMINA]] [--folder_names_nanopore [FOLDER_NAMES_NANOPORE]]
+usage: create_directories.py [-h] --dest_path DEST_PATH --project_name PROJECT_NAME --data_type {illumina,nanopore,both} [--folder_names_illumina [FOLDER_NAMES_ILLUMINA]]
+                             [--folder_names_nanopore [FOLDER_NAMES_NANOPORE]]
 
-Create directory structure for illumina data.
+Create directory structure for illumina and nanopore data.
 
 options:
   -h, --help            show this help message and exit
@@ -253,13 +246,11 @@ options:
   --data_type {illumina,nanopore,both}
                         Type of data (illumina/nanopore/both)
   --folder_names_illumina [FOLDER_NAMES_ILLUMINA]
-                        Comma separated folder names for Illumina (if multiple) (format: date_PlateInfo, e.g., 2024-12-24_Plate1-to-
-                        Plate3,2024-12-25_Plate4-to-Plate6)
+                        Comma separated folder names for Illumina (if multiple) (format: date_PlateInfo, e.g., 2024-12-24_Plate1-to-Plate3,2024-12-25_Plate4)
   --folder_names_nanopore [FOLDER_NAMES_NANOPORE]
-                        Comma separated folder names for Nanopore (if multiple) (format: date_PlateInfo, e.g., 2024-09-14_Plate4-to-
-                        Plate6,2024-09-15_Plate7-to-Plate10)
+                        Comma separated folder names for Nanopore (if multiple) (format: date_PlateInfo, e.g., 2024-09-14_Batch4-to-Batch6,2024-09-15_Batch7)
 ```
-**_If you are unsure which batch your samples are from, click [here](https://docs.google.com/spreadsheets/d/1L4ic5RthXNmEkHlSogRKZghZ0EPi2UT3ri6RUaguQEU/edit?gid=2116112669#gid=2116112669). If you are unable to open the link, slack Evan for access to the excel._**
+**_If you are unsure which batch your samples are from, click [here](https://docs.google.com/spreadsheets/d/1L4ic5RthXNmEkHlSogRKZghZ0EPi2UT3ri6RUaguQEU/edit?gid=1595928#gid=1595928). If you are unable to open the link, slack Evan for access to the excel._**
 
 > Create the batch folders and respective subdirectories in your project folder.
 
@@ -311,7 +302,7 @@ Success! All specified directories have been created.
 14 directories, 0 files
 ```
 
-_**STOP AND CHECK**_: If your batch directory aka `../Sequence_data/ONT/2024-11-07_Batch1/` does not have the sub-directories as seen above, do not move on and slack Dhatri. 
+_**STOP AND CHECK**_: If your batch directory aka `../Sequence_data/ONT/2024-11-07_Batch1/` does not have the subdirectories as seen above, do not move on and slack Dhatri. 
 
 
 ## Move renamed samples to Project folder 
@@ -335,13 +326,13 @@ test_sample_lookup.csv  renamed_file_commands.sh
 
 ## Run nanoQC
 
-9. You are now ready to start processing your short reads. We will be using one of our in house pipelines, [nanoQC](https://github.com/Snitkin-Lab-Umich/nanoQC), to run on the renamed samples. Click on the link and follow the instructions as described on the Github page. 
+9. You are now ready to start processing your long reads. We will be using one of our in house pipelines—[nanoQC](https://github.com/Snitkin-Lab-Umich/nanoQC)—to run on the renamed samples. Click on the link and follow the instructions as described on the Github page. 
 
 _**STOP AND CHECK**_: If you run into any issues running nanoQC, please slack Dhatri immediately and do not move forward with the following steps. Ensure you have generated the QC report before moving on.
 
 ## Move nanoQC results to Project directory
 
-Once you have finished running nanoQC on your scratch directory and globus has succesfully transferred the raw fastq files, you are ready to move importatn QCD outputs to your Project folder. 
+Once you have finished running nanoQC on your scratch directory and globus has succesfully transferred the raw fastq files, you are ready to move important nanoQC outputs to your Project folder. 
 
 10. Move nanoQC outputs using [globus](https://app.globus.org/file-manager?two_pane=true) since the output files are massive and take a while to transfer.
 
@@ -349,7 +340,7 @@ Once you have finished running nanoQC on your scratch directory and globus has s
 
 ![image](pics/transfer-nanoQC-results.png)
 
-11. Once you have confirmed that the results has been moved (you should get an email from globus), create a folder, `nanoQC_snakemake_pipeline`, in your newly moved results folder here `/nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/2024-11-07_Batch1/`.
+11. Once you have confirmed that the results have been moved (you should get an email from globus), create a folder, `nanoQC_snakemake_pipeline`, in your newly moved results folder here `/nfs/turbo/umms-esnitkin/Project_Test_Nanopore_Org/Sequence_data/ONT/2024-11-07_Batch1/`.
 
 > `cd` into your nanoQC results folder and create a new folder `nanoQC_snakemake_pipeline`.
 
@@ -359,28 +350,6 @@ Once you have finished running nanoQC on your scratch directory and globus has s
 (base) [dhatrib@gl-login3 2024-10-28_Project_Cauris_nanoQC]$ ls
 2024-10-28_Project_Cauris_nanoQC_report nanoQC_snakemake_pipeline  filtlong  flye  medaka ....
 ```
-<!-- >
-12. Start and interative session and navigate to your QCD results folder.
-
-> Start an interactive session. Increase/decrease `--cpus-per-task` and `--time` according to your sample size. 
-```
-srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=3 --time=7:00:00 --pty /bin/bash
-```
-
-> Ensure you are in the right directory.
-```
-cd /scratch/esnitkin_root/esnitkin1/uniqname/path/to/QCD
-```
-
-> This is what you should be seeing after finishing the 2 steps above. 
-```
-(base) [dhatrib@gl-login3 QCD]$ srun --account=esnitkin1 --nodes=1 --ntasks-per-node=1 --mem-per-cpu=5GB --cpus-per-task=3 --time=8:00:00 --pty /bin/bash
-srun: job 12759868 queued and waiting for resources
-srun: job 12759868 has been allocated resources
-(base) [dhatrib@gl3021 QCD]$ ls
-config    QCD.smk   QCD_report.smk README.md ...
-```
--->
 > Move into your results folder and copy the Snakefiles, config, samples and cluster files to your plate directory.
 
 ```
@@ -389,14 +358,13 @@ config    QCD.smk   QCD_report.smk README.md ...
 nanoQC.smk nanoQC_summary.smk config.yaml samples.csv cluster.json
 ```
 
-
-13. Once you have confirmed that the results has been moved (you should get an email from globus), you are now ready to move the results from nanoQC to the respective folders in your batch directory using `move_files_to_directories_nanopore.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/nanopore/move_files_to_directories_nanopore.py -h`.
+13. Once you have confirmed that the results has been moved (you should get an email from globus), you are now ready to move the results from nanoQC to the respective folders in your batch directory using `move_files_to_dirs_nanopore.py`. To understand how to use the python script, try `python3 /scratch/esnitkin_root/esnitkin1/uniqname/path/to/Data-Flow-SOP/nanopore/move_files_to_dirs_nanopore.py -h`.
 
 ```
-(base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP/move_files_to_directories_illumina.py -h
+(base) [dhatrib@gl3021 results]$ python3 /scratch/esnitkin_root/esnitkin1/dhatrib/Data-Flow-SOP/nanopore/move_files_to_dirs_nanopore.py -h
 usage: move_files_to_dirs_nanopore.py [-h] --batch_info_path BATCH_INFO_PATH --nanoQC_results_path NANOQC_RESULTS_PATH
 
-Process and organize nanopore and hybrid sequencing data.
+Process and organize nanopore sequencing data.
 
 options:
   -h, --help            show this help message and exit
@@ -427,7 +395,7 @@ Yay, passed and failed sample files were transferred to their respective folders
 Yay, samples from passed_samples.txt file have been moved to clean_fastq_qc_pass_samples directory and all specified samples have been moved to the assembly directory successfully!
 ```
 
-***If you see the above message, you have finished QC-ing your long reads and are ready to move forward with downstream analysis. Happy sciencing!***
+***If you see the above message, you have finished QC-ing your long reads and are ready to move forward with downstream analysis. Happy science-ing!***
 
 <!-- >
 ### Rule of thumb(s):
