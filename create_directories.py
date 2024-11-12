@@ -48,8 +48,8 @@ def main():
     parser.add_argument("--dest_path", required=True, help="Destination path where directories need to be created—do NOT include project name (e.g., /nfs/turbo/umms-esnitkin/)")
     parser.add_argument("--project_name", required=True, help="Name of your project (format: Project_Name-of-Project, e.g., Project_MDHHS)")
     parser.add_argument("--data_type", choices=["illumina", "nanopore", "both"], required=True, help="Type of data (illumina/nanopore/both)")
-    parser.add_argument("--folder_names_illumina", nargs='?', const='', help="Comma separated folder names for Illumina (if multiple) (format: date_PlateInfo, e.g., 2024-12-24_Plate1-to-Plate3,2024-12-25_Plate4-to-Plate6)")
-    parser.add_argument("--folder_names_nanopore", nargs='?', const='', help="Comma separated folder names for Nanopore (if multiple) (format: date_PlateInfo, e.g., 2024-09-14_Plate4-to-Plate6,2024-09-15_Plate7-to-Plate10)")
+    parser.add_argument("--folder_names_illumina", nargs='?', const='', help="Comma separated folder names for Illumina (if multiple) (format: date_PlateInfo, e.g., 2024-12-24_Plate1-to-Plate3,2024-12-25_Plate4)")
+    parser.add_argument("--folder_names_nanopore", nargs='?', const='', help="Comma separated folder names for Nanopore (if multiple) (format: date_PlateInfo, e.g., 2024-09-14_Batch4-to-Batch6,2024-09-15_Batch7)")
 
     args = parser.parse_args()
 
