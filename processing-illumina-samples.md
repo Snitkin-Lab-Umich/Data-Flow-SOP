@@ -85,13 +85,12 @@ The following script, `create_higher_level_dirs.py`, will create your Project fo
 (base) [dhatrib@gl-login3 Data-Flow-SOP]$ python3 create_higher_level_dirs.py -h
 usage: create_higher_level_dirs.py [-h] --dest_path DEST_PATH --project_name PROJECT_NAME --data_type {illumina,nanopore,both}
 
-Create project folder and higher level directory structure for illumina data.
+Create project folder and higher level directory structure for illumina and nanopore data.
 
 options:
   -h, --help            show this help message and exit
   --dest_path DEST_PATH
-                        Destination path where directories need to be created—do NOT include project name (e.g., /nfs/turbo/umms-
-                        esnitkin/)
+                        Destination path where directories need to be created—do NOT include project name (e.g., /nfs/turbo/umms-esnitkin/)
   --project_name PROJECT_NAME
                         Name of your project (format: Project_Name-of-Project, e.g., Project_MDHHS)
   --data_type {illumina,nanopore,both}
@@ -245,7 +244,7 @@ MERLIN_107_R1.fastq.gz  MERLIN_10_R1.fastq.gz  MERLIN_111_R1.fastq.gz  MERLIN_11
 MERLIN_107_R2.fastq.gz  MERLIN_10_R2.fastq.gz  MERLIN_111_R2.fastq.gz  MERLIN_114_R2.fastq.gz  MERLIN_1_R2.fastq.gz  TEST_NEG_CTL_21_R2.fastq.gz
 ```
 
-_**STOP AND CHECK**_: If there are files that have not been renamed or you receive this message `Error: no files were nrenamed!`, please slack Dhatri immediately and do not move forward with the following steps.
+_**STOP AND CHECK**_: If there are files that have not been renamed or you receive this message `Error renaming files`, please slack Dhatri immediately and do not move forward with the following steps.
 
 ## Create plate directory to house the renamed samples
 
@@ -255,10 +254,10 @@ Once the samples have been renamed, you are now ready to move them from temporar
 
 ```
 (base) [dhatrib@gl-login2 fastqs_test_illumina]$ python3 /scratch/esnitkin_root/esnitkin99/dhatrib/Data-Flow-SOP/create_directories.py -h
-usage: create_directories.py [-h] --dest_path DEST_PATH --project_name PROJECT_NAME --data_type {illumina,nanopore,both}
-                             [--folder_names_illumina [FOLDER_NAMES_ILLUMINA]] [--folder_names_nanopore [FOLDER_NAMES_NANOPORE]]
+usage: create_directories.py [-h] --dest_path DEST_PATH --project_name PROJECT_NAME --data_type {illumina,nanopore,both} [--folder_names_illumina [FOLDER_NAMES_ILLUMINA]]
+                             [--folder_names_nanopore [FOLDER_NAMES_NANOPORE]]
 
-Create directory structure for illumina data.
+Create directory structure for illumina and nanopore data.
 
 options:
   -h, --help            show this help message and exit
@@ -269,11 +268,9 @@ options:
   --data_type {illumina,nanopore,both}
                         Type of data (illumina/nanopore/both)
   --folder_names_illumina [FOLDER_NAMES_ILLUMINA]
-                        Comma separated folder names for Illumina (if multiple) (format: date_PlateInfo, e.g., 2024-12-24_Plate1-to-
-                        Plate3,2024-12-25_Plate4-to-Plate6)
+                        Comma separated folder names for Illumina (if multiple) (format: date_PlateInfo, e.g., 2024-12-24_Plate1-to-Plate3,2024-12-25_Plate4)
   --folder_names_nanopore [FOLDER_NAMES_NANOPORE]
-                        Comma separated folder names for Nanopore (if multiple) (format: date_PlateInfo, e.g., 2024-09-14_Plate4-to-
-                        Plate6,2024-09-15_Plate7-to-Plate10)
+                        Comma separated folder names for Nanopore (if multiple) (format: date_PlateInfo, e.g., 2024-09-14_Batch4-to-Batch6,2024-09-15_Batch7)
 ```
 **_If you are unsure which plate(s) your samples are from, click [here](https://docs.google.com/spreadsheets/d/1L4ic5RthXNmEkHlSogRKZghZ0EPi2UT3ri6RUaguQEU/edit?gid=2116112669#gid=2116112669). If you are unable to open the link, slack Evan for access to the excel._**
 
