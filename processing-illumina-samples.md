@@ -10,7 +10,7 @@ _**COMING SOON**: To understand which scripts are being called and executed, and
 - [Processing illumina samples](#processing-illumina-samples)
   - [Getting started](#getting-started)
     - [Installation](#installation)
-  - [Creare Project folder/directory](#create-project-folder)
+  - [Create Project folder/directory](#create-project-folder)
   - [Rename samples](#rename-samples)
   - [Create plate directory](#create-plate-directory-to-house-the-renamed-samples)
   - [Move samples to Project directory](#move-renamed-samples-to-project-folder)
